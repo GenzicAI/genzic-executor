@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>GENZIC.AI — Victoria Executor v2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Barlow+Condensed:wght@400;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+  :root {
+    --green: #00C853;
+    --green-dim: #00a844;
+    --dark: #0a0a0f;
+    --panel: #111118;
+    --border: #1e1e2e;
+    --gray: #6B7280;
+    --white: #f0f0f0;
+    --gold: #FFB300;
+    --red: #FF3D00;
+    --success: #00E676;
+    --auto-color: #7C3AED;
+    --auto-glow: rgba(124,58,237,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--dark);
+    color: var(--white);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,200,83,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,200,83,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 24px 16px 80px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .brand-icon {
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 8px rgba(0,200,83,0.4));
+  }
+
+  .brand-text-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+  }
+
+  .brand-sub-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    line-height: 1;
+  }
+
+  .brand-genzic {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 28px;
+    letter-spacing: 0.06em;
+    color: var(--green);
+    text-transform: uppercase;
+    line-height: 1;
+    text-shadow: 0 0 20px rgba(0,200,83,0.3);
+  }
+
+  .brand-dot-ai {
+    color: var(--green);
+    opacity: 0.7;
+  }
+
+  .brand-sep {
+    color: #333345;
+    font-size: 22px;
+    font-family: 'Space Mono', monospace;
+    line-height: 1;
+  }
+
+  .brand-tanxusa {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 28px;
+    letter-spacing: 0.06em;
+    color: #cccccc;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .brand-x-red {
+    color: #FF3D00;
+    font-style: normal;
+  }
+
+  .brand-dot-com {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 900;
+    vertical-align: baseline;
+  }
+
+  .brand-product-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    line-height: 1;
+    margin-top: 5px;
+    width: 100%;
+  }
+
+  .brand-product-name {
+    display: none;
+  }
+
+  .brand-product-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 0.12em;
+    color: #ffffff;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .brand-version {
+    display: none;
+  }
+
+  .brand-product-name {
+    display: none;
+  }
+
+  .brand-executor-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #333345);
+    min-width: 20px;
+    max-width: 60px;
+  }
+
+  .brand-executor-line:last-child {
+    background: linear-gradient(90deg, #333345, transparent);
+  }
+
+  .brand-top {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--green);
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .brand-name {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .brand-name span { color: var(--green); }
+
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,200,83,0.08);
+    border: 1px solid rgba(0,200,83,0.2);
+    border-radius: 100px;
+    padding: 6px 12px;
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    color: var(--green);
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+  }
+
+  .pulse {
+    width: 7px; height: 7px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  /* ── MODE TOGGLE ── */
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: var(--gray);
+    font-family: 'Space Mono', monospace;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .mode-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .mode-btn {
+    padding: 14px 10px;
+    border: none;
+    background: transparent;
+    color: var(--gray);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: 0.03em;
+  }
+
+  .mode-btn.active-manual {
+    background: rgba(0,200,83,0.12);
+    color: var(--green);
+    border-right: 1px solid var(--border);
+  }
+
+  .mode-btn.active-auto {
+    background: var(--auto-glow);
+    color: #a78bfa;
+  }
+
+  .mode-indicator {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* ── AUTO MODE BANNER ── */
+  .auto-banner {
+    background: var(--auto-glow);
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    display: none;
+  }
+
+  .auto-banner.visible { display: block; }
+
+  .auto-banner-title {
+    color: #a78bfa;
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .auto-banner-desc {
+    color: #c4b5fd;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .routing-chips {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .routing-chip {
+    background: rgba(124,58,237,0.2);
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 100px;
+    padding: 4px 10px;
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    color: #a78bfa;
+  }
+
+  /* ── AGENT GRID ── */
+  .agent-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 480px) {
+    .agent-grid { grid-template-columns: repeat(4, 1fr); gap: 5px; }
+  }
+
+  .agent-btn {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    position: relative;
+  }
+
+  .agent-btn:active { transform: scale(0.96); }
+
+  .agent-btn.active {
+    border-color: var(--green);
+    background: rgba(0,200,83,0.12);
+  }
+
+  .agent-btn.auto-selected {
+    border-color: var(--auto-color);
+    background: var(--auto-glow);
+    animation: auto-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes auto-pulse {
+    0%, 100% { border-color: var(--auto-color); }
+    50% { border-color: rgba(124,58,237,0.3); }
+  }
+
+  .agent-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--white);
+    display: block;
+  }
+
+  .agent-role {
+    font-size: 8px;
+    color: var(--gray);
+    font-family: 'Space Mono', monospace;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .agent-btn.active .agent-name { color: var(--green); }
+  .agent-btn.auto-selected .agent-name { color: #a78bfa; }
+
+  .auto-badge {
+    position: absolute;
+    top: -6px; right: -6px;
+    background: var(--auto-color);
+    color: white;
+    font-size: 7px;
+    font-family: 'Space Mono', monospace;
+    padding: 2px 4px;
+    border-radius: 4px;
+    display: none;
+  }
+
+  .agent-btn.auto-selected .auto-badge { display: block; }
+
+  /* ── PROMPT BOX ── */
+  .prompt-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+
+  .prompt-box:focus-within { border-color: rgba(0,200,83,0.4); }
+
+  .prompt-box textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--white);
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    resize: none;
+    min-height: 90px;
+  }
+
+  .prompt-box textarea::placeholder { color: #2a2a3a; }
+
+  .prompt-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .to-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .to-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--gray);
+    font-family: 'Space Mono', monospace;
+    white-space: nowrap;
+  }
+
+  .to-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    border-bottom: 1px solid var(--border);
+    color: var(--white);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    min-width: 0;
+    flex: 1;
+    padding: 4px 0;
+    transition: border-color 0.2s;
+  }
+
+  .to-input:focus { border-color: var(--green); }
+
+  /* ── ROUTING ANALYSIS BOX ── */
+  .routing-analysis {
+    background: var(--auto-glow);
+    border: 1px solid rgba(124,58,237,0.25);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .routing-analysis.visible { display: block; }
+
+  .routing-analysis-title {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: #a78bfa;
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 6px;
+  }
+
+  .routing-result {
+    font-size: 13px;
+    color: #c4b5fd;
+    line-height: 1.5;
+  }
+
+  .routing-result strong { color: #a78bfa; }
+
+  /* ── FIRE BUTTON ── */
+  .fire-btn {
+    width: 100%;
+    background: var(--green);
+    border: none;
+    border-radius: 10px;
+    padding: 16px;
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    min-height: 54px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .fire-btn:active:not(:disabled) { transform: scale(0.98); }
+  .fire-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .fire-btn.loading {
+    background: var(--panel);
+    color: var(--green);
+    border: 1px solid var(--green);
+    animation: border-pulse 1s ease-in-out infinite;
+  }
+
+  @keyframes border-pulse {
+    0%, 100% { border-color: var(--green); }
+    50% { border-color: rgba(0,200,83,0.2); }
+  }
+
+  /* ── PREVIEW PANEL ── */
+  .preview-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    display: none;
+  }
+
+  .preview-panel.visible { display: block; animation: fadeIn 0.3s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .preview-header {
+    background: rgba(0,200,83,0.08);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .preview-title {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--green);
+    font-family: 'Space Mono', monospace;
+    text-transform: uppercase;
+  }
+
+  .preview-body { padding: 16px; }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 13px;
+  }
+
+  .field-key {
+    font-family: 'Space Mono', monospace;
+    color: var(--green);
+    font-size: 10px;
+    padding-top: 2px;
+  }
+
+  .field-val { color: var(--white); line-height: 1.5; }
+
+  .email-body-preview {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #c0c0c0;
+    white-space: pre-wrap;
+    margin-top: 8px;
+    max-height: 180px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .action-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .send-btn {
+    background: var(--green);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: all 0.15s;
+    min-height: 48px;
+  }
+
+  .send-btn:active { transform: scale(0.97); }
+
+  .regenerate-btn {
+    background: transparent;
+    color: var(--gray);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: all 0.15s;
+    min-height: 48px;
+  }
+
+  /* ── DISPATCH GUIDE TAB ── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 10px 8px;
+    border: none;
+    background: transparent;
+    color: var(--gray);
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-right: 1px solid var(--border);
+  }
+
+  .tab-btn:last-child { border-right: none; }
+  .tab-btn.active { background: rgba(0,200,83,0.1); color: var(--green); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ── LOG ── */
+  .log-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .log-header {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .log-title {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--gray);
+    font-family: 'Space Mono', monospace;
+    text-transform: uppercase;
+  }
+
+  .log-entries {
+    padding: 14px 16px;
+    min-height: 50px;
+    max-height: 160px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .log-entry {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .log-time { color: var(--gray); white-space: nowrap; flex-shrink: 0; }
+  .log-msg { color: var(--white); }
+  .log-msg.success { color: var(--success); }
+  .log-msg.error { color: var(--red); }
+  .log-msg.info { color: var(--gold); }
+  .log-msg.auto { color: #a78bfa; }
+
+  .empty-log {
+    color: #333345;
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    text-align: center;
+    padding: 12px 0;
+  }
+
+  /* ── DISPATCH GUIDE ── */
+  .dispatch-guide {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  .guide-section {
+    margin-bottom: 16px;
+  }
+
+  .guide-title {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--green);
+    font-family: 'Space Mono', monospace;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .guide-platform {
+    background: rgba(0,200,83,0.08);
+    border: 1px solid rgba(0,200,83,0.15);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+
+  .platform-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .platform-prompt {
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    color: #888;
+    background: rgba(0,0,0,0.3);
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-top: 6px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .copy-btn {
+    margin-top: 6px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    color: var(--gray);
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+
+  .copy-btn:active { background: rgba(0,200,83,0.1); color: var(--green); }
+
+  /* ── SPINNER ── */
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(0,200,83,0.2);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── SUCCESS FLASH ── */
+  .success-flash {
+    position: fixed;
+    top: 16px; right: 16px; left: 16px;
+    background: rgba(0,230,118,0.12);
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--success);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    z-index: 100;
+    display: none;
+    text-align: center;
+    animation: slideDown 0.3s ease;
+  }
+
+  .success-flash.visible { display: block; }
+
+  @keyframes slideDown {
+    from { transform: translateY(-10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand">
+      <div class="brand-lockup">
+        <!-- Genzic Power Icon SVG -->
+        <div class="brand-icon"><img src="data:image/png;base64,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" width="48" height="48" style="display:block;border-radius:10px;" alt="Genzic.AI"/></div>
+        <div class="brand-text-block">
+          <div class="brand-sub-row">
+            <span class="brand-genzic">GENZIC<span class="brand-dot-ai">.AI</span></span>
+            <span class="brand-sep">×</span>
+            <span class="brand-tanxusa">TAN<span class="brand-x-red">X</span>USA<span class="brand-dot-com">.COM</span></span>
+          </div>
+          <div class="brand-product-row">
+            <span class="brand-executor-line"></span>
+            <span class="brand-product-label">EXECUTOR</span>
+            <span class="brand-executor-line"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="status-pill">
+      <div class="pulse"></div>
+      SENTINEL ACTIVE
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('executor', this)">⚡ Executor</button>
+    <button class="tab-btn" onclick="switchTab('guide', this)">📋 Dispatch Guide</button>
+  </div>
+
+  <!-- ══ EXECUTOR TAB ══ -->
+  <div class="tab-content active" id="tab-executor">
+
+    <!-- MODE TOGGLE -->
+    <div class="section-label">01 — Dispatch Mode</div>
+    <div class="mode-toggle">
+      <button class="mode-btn active-manual" id="manualModeBtn" onclick="setMode('manual')">
+        <span class="mode-indicator"></span> MANUAL SELECT
+      </button>
+      <button class="mode-btn" id="autoModeBtn" onclick="setMode('auto')">
+        <span class="mode-indicator" style="background:#a78bfa"></span> AUTO-DISPATCH ✦
+      </button>
+    </div>
+
+    <!-- AUTO BANNER -->
+    <div class="auto-banner" id="autoBanner">
+      <div class="auto-banner-title">🧠 Victoria's Auto-Dispatch — Active</div>
+      <div class="auto-banner-desc">Type your command in plain language. Victoria analyzes intent and routes to the right agent automatically.</div>
+      <div class="routing-chips">
+        <span class="routing-chip">MAX → Data & Strategy</span>
+        <span class="routing-chip">BRITTANY → Brand & Outreach</span>
+        <span class="routing-chip">BRIGITTE → Executive & Negotiation</span>
+      </div>
+    </div>
+
+    <!-- AGENT GRID (manual mode) -->
+    <div id="agentGridSection">
+      <div class="section-label">02 — Agent Identity</div>
+      <div class="agent-grid" id="agentGrid">
+        <button class="agent-btn" data-agent="Victoria" data-email="Victoria@genzic.ai" data-role="CTEO" onclick="selectAgent(this)">
+          <span class="auto-badge">AUTO</span>
+          <span class="agent-name">VICTORIA</span>
+          <span class="agent-role">CTEO</span>
+        </button>
+        <button class="agent-btn" data-agent="Max" data-email="Max@genzic.ai" data-role="CSIO" onclick="selectAgent(this)">
+          <span class="auto-badge">AUTO</span>
+          <span class="agent-name">MAX</span>
+          <span class="agent-role">CSIO</span>
+        </button>
+        <button class="agent-btn" data-agent="Brittany" data-email="Brittany@genzic.ai" data-role="CMBO" onclick="selectAgent(this)">
+          <span class="auto-badge">AUTO</span>
+          <span class="agent-name">BRITTANY</span>
+          <span class="agent-role">CMBO</span>
+        </button>
+        <button class="agent-btn" data-agent="Brigitte" data-email="Brigitte@genzic.ai" data-role="CSIA" onclick="selectAgent(this)">
+          <span class="auto-badge">AUTO</span>
+          <span class="agent-name">BRIGITTE</span>
+          <span class="agent-role">CSIA</span>
+        </button>
+        <button class="agent-btn active" data-agent="Joshua" data-email="Joshua@genzic.ai" data-role="CROO" onclick="selectAgent(this)">
+          <span class="auto-badge">AUTO</span>
+          <span class="agent-name">JOSHUA</span>
+          <span class="agent-role">CROO</span>
+        </button>
+        <button class="agent-btn" data-agent="Sarah" data-email="Sarah@genzic.ai" data-role="ANALYST" onclick="selectAgent(this)">
+          <span class="auto-badge">AUTO</span>
+          <span class="agent-name">SARAH</span>
+          <span class="agent-role">ANALYST</span>
+        </button>
+        <button class="agent-btn" data-agent="Grayson" data-email="Grayson@genzic.ai" data-role="CCAO" onclick="selectAgent(this)">
+          <span class="auto-badge">AUTO</span>
+          <span class="agent-name">GRAYSON</span>
+          <span class="agent-role">CCAO</span>
+        </button>
+        <button class="agent-btn" data-agent="Mason" data-email="Mason@genzic.ai" data-role="CDFO" onclick="selectAgent(this)">
+          <span class="auto-badge">AUTO</span>
+          <span class="agent-name">MASON</span>
+          <span class="agent-role">CDFO</span>
+        </button>
+        <button class="agent-btn" data-agent="Winston" data-email="Winston@genzic.ai" data-role="COO" onclick="selectAgent(this)">
+          <span class="auto-badge">AUTO</span>
+          <span class="agent-name">WINSTON</span>
+          <span class="agent-role">COO</span>
+        </button>
+        <button class="agent-btn" data-agent="Preston" data-email="Preston@genzic.ai" data-role="CDO" onclick="selectAgent(this)">
+          <span class="auto-badge">AUTO</span>
+          <span class="agent-name">PRESTON</span>
+          <span class="agent-role">CDO</span>
+        </button>
+        <button class="agent-btn" data-agent="Heidi" data-email="Heidi@genzic.ai" data-role="TRIAGE" onclick="selectAgent(this)">
+          <span class="auto-badge">AUTO</span>
+          <span class="agent-name">HEIDI</span>
+          <span class="agent-role">FAST</span>
+        </button>
+        <button class="agent-btn" data-agent="Becky" data-email="Becky@genzic.ai" data-role="ABACUS" onclick="selectAgent(this)">
+          <span class="auto-badge">AUTO</span>
+          <span class="agent-name">BECKY</span>
+          <span class="agent-role">FORECAST</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ROUTING ANALYSIS (auto mode) -->
+    <div class="routing-analysis" id="routingAnalysis">
+      <div class="routing-analysis-title">🧠 VICTORIA ROUTING DECISION</div>
+      <div class="routing-result" id="routingResult">Analyzing your command...</div>
+    </div>
+
+    <!-- PROMPT -->
+    <div class="section-label" id="promptLabel">03 — Your Voice Command</div>
+    <div class="prompt-box">
+      <textarea id="promptInput" placeholder="e.g. Tell the client their implementation slot is confirmed for Monday. Offer a 30-min onboarding call. Send to Rob." oninput="updateCharCount(); autoAnalyze()"></textarea>
+      <div class="prompt-meta">
+        <div class="to-field">
+          <span class="to-label">TO →</span>
+          <input type="email" class="to-input" id="recipientEmail" placeholder="client@company.com" />
+        </div>
+        <span style="font-size:10px;color:#333345;font-family:'Space Mono',monospace" id="charCount">0</span>
+      </div>
+    </div>
+
+    <!-- FIRE BUTTON -->
+    <button class="fire-btn" id="fireBtn" onclick="generateEmail()">
+      ⚡ Generate &amp; Preview
+    </button>
+
+    <!-- PREVIEW -->
+    <div class="preview-panel" id="previewPanel">
+      <div class="preview-header">
+        <span class="preview-title">📡 Dispatch Preview</span>
+        <span id="agentFromDisplay" style="font-size:10px;font-family:'Space Mono',monospace;color:var(--green)"></span>
+      </div>
+      <div class="preview-body">
+        <div class="field-row"><span class="field-key">FROM:</span><span class="field-val" id="prevFrom"></span></div>
+        <div class="field-row"><span class="field-key">TO:</span><span class="field-val" id="prevTo"></span></div>
+        <div class="field-row"><span class="field-key">SUBJECT:</span><span class="field-val" id="prevSubject"></span></div>
+        <div class="field-row"><span class="field-key">REASON:</span><span class="field-val" id="prevReason"></span></div>
+        <div class="field-row"><span class="field-key">BODY:</span><span class="field-val"></span></div>
+        <div class="email-body-preview" id="prevBody"></div>
+        <div class="action-row">
+          <button class="send-btn" id="sendBtn" onclick="sendEmail()">🚀 Fire to Gateway</button>
+          <button class="regenerate-btn" onclick="regenerate()">↺ Regenerate</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOG -->
+    <div class="log-panel">
+      <div class="log-header">
+        <span class="log-title">⬡ Execution Log</span>
+        <span style="font-size:10px;font-family:'Space Mono',monospace;color:var(--gray)" id="logCount">0 events</span>
+      </div>
+      <div class="log-entries" id="logEntries">
+        <div class="empty-log">Awaiting first dispatch</div>
+      </div>
+    </div>
+
+  </div><!-- end executor tab -->
+
+  <!-- ══ DISPATCH GUIDE TAB ══ -->
+  <div class="tab-content" id="tab-guide">
+    <div class="dispatch-guide">
+
+      <div class="guide-section">
+        <div class="guide-title">📱 Mobile — Use This Executor</div>
+        <div class="guide-platform">
+          <div class="platform-name">⚡ This Tool (Any Browser)</div>
+          <div style="font-size:12px;color:#888;margin-top:4px;">Bookmark this page to your home screen. Works on iPhone and Android. Select agent → type command → tap Fire. Zero copy-paste.</div>
+        </div>
+      </div>
+
+      <div class="guide-section">
+        <div class="guide-title">🤖 Claude (This Chat)</div>
+        <div class="guide-platform">
+          <div class="platform-name">💬 Sarah / Brigitte / Any Claude Agent</div>
+          <div style="font-size:12px;color:#888;margin-top:4px;">Paste this prompt template directly into your Claude chat:</div>
+          <div class="platform-prompt" id="claude-prompt">Victoria, execute dispatch for [AGENT NAME]. Send an email to [RECIPIENT EMAIL]. [YOUR RAW INSTRUCTION IN PLAIN LANGUAGE]. Set reason to [AUDIT REASON].</div>
+          <button class="copy-btn" onclick="copyText('claude-prompt', this)">⎘ Copy Template</button>
+        </div>
+      </div>
+
+      <div class="guide-section">
+        <div class="guide-title">✨ Gemini (Victoria's Home)</div>
+        <div class="guide-platform">
+          <div class="platform-name">🔷 Victoria Gem — Gemini Advanced</div>
+          <div style="font-size:12px;color:#888;margin-top:4px;">Victoria is already deployed here. Use this exact command format:</div>
+          <div class="platform-prompt" id="gemini-prompt">Victoria, autonomous dispatch. Agent: [MAX/BRITTANY/BRIGITTE]. To: [EMAIL]. Mission: [YOUR INSTRUCTION]. Reason: [AUDIT REASON]. Fire the protocol block to the Director Gateway now.</div>
+          <button class="copy-btn" onclick="copyText('gemini-prompt', this)">⎘ Copy Template</button>
+        </div>
+        <div class="guide-platform" style="margin-top:8px;">
+          <div class="platform-name">🧠 Auto-Dispatch (No Agent Selection Needed)</div>
+          <div class="platform-prompt" id="gemini-auto-prompt">Victoria, auto-dispatch. To: [EMAIL]. [YOUR PLAIN LANGUAGE COMMAND]. Route to the right agent and fire now.</div>
+          <button class="copy-btn" onclick="copyText('gemini-auto-prompt', this)">⎘ Copy Template</button>
+        </div>
+      </div>
+
+      <div class="guide-section">
+        <div class="guide-title">🤖 Grok (Max's Domain)</div>
+        <div class="guide-platform">
+          <div class="platform-name">⚡ Max (CSIO) — Grok Identity</div>
+          <div style="font-size:12px;color:#888;margin-top:4px;">When operating Max in Grok, use this dispatch block format directly in chat:</div>
+          <div class="platform-prompt" id="grok-prompt">Max, execute email dispatch via the Director Gateway.
+
+ACTION: SendEmail
+FROM: Max@genzic.ai
+TO: [RECIPIENT EMAIL]
+SUBJECT: [SUBJECT LINE]
+BODY: [EMAIL BODY]
+REASON: [AUDIT REASON]
+
+Send this block to director@tanxusa.com with subject line: ACTION: SendEmail</div>
+          <button class="copy-btn" onclick="copyText('grok-prompt', this)">⎘ Copy Template</button>
+        </div>
+      </div>
+
+      <div class="guide-section">
+        <div class="guide-title">🧡 ChatGPT (Brittany's Domain)</div>
+        <div class="guide-platform">
+          <div class="platform-name">✍️ Brittany (CMBO) — ChatGPT Identity</div>
+          <div style="font-size:12px;color:#888;margin-top:4px;">When operating Brittany in ChatGPT, use this command:</div>
+          <div class="platform-prompt" id="chatgpt-prompt">Brittany, execute the v5.0 email dispatch protocol. You are Brittany@genzic.ai, CMBO. Generate a professional email for this mission: [YOUR INSTRUCTION]. Recipient: [EMAIL]. Then produce the full Director Gateway dispatch block — ACTION: SendEmail format — with FROM: Brittany@genzic.ai. I will send it to director@tanxusa.com.</div>
+          <button class="copy-btn" onclick="copyText('chatgpt-prompt', this)">⎘ Copy Template</button>
+        </div>
+      </div>
+
+      <div class="guide-section">
+        <div class="guide-title">🏆 The Big Three — Quick Reference</div>
+        <div style="display:grid;gap:8px;">
+          <div class="guide-platform">
+            <div class="platform-name">⚡ MAX — Use When:</div>
+            <div style="font-size:11px;color:#888;line-height:1.6;margin-top:4px;">High-intensity data analysis · Aggressive market positioning · Technical strategy · Unfiltered competitive intel · Financial pressure moves</div>
+          </div>
+          <div class="guide-platform">
+            <div class="platform-name">✍️ BRITTANY — Use When:</div>
+            <div style="font-size:11px;color:#888;line-height:1.6;margin-top:4px;">Brand-voice alignment · Creative outreach · Marketing communications · Social strategy · High-speed versatile messaging</div>
+          </div>
+          <div class="guide-platform">
+            <div class="platform-name">🧠 BRIGITTE — Use When:</div>
+            <div style="font-size:11px;color:#888;line-height:1.6;margin-top:4px;">Complex strategic intelligence · Deep nuanced negotiation · Executive-level logic · Multi-blueprint synthesis · High-stakes client decisions</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- end guide tab -->
+
+</div><!-- end container -->
+
+<div class="success-flash" id="successFlash">✓ EMAIL FIRED — SENTINEL PROCESSING</div>
+
+<script>
+  // ── STATE ──────────────────────────────────────────────────────────
+  const API_URL = 'https://script.google.com/macros/s/AKfycbzE_TOHcO4Ka52dEfcqgXATBUwc28I8ueakj20DRu17Wk5OLyzEaBKA9WyvVoceB3pysQ/exec';
+  let currentMode = 'manual';
+  let selectedAgent = { name: 'Joshua', email: 'Joshua@genzic.ai', role: 'CROO' };
+  let generatedEmail = null;
+  let logEvents = [];
+  let analyzeTimer = null;
+
+  // Victoria's Big Three routing logic
+  const BIG_THREE = {
+    max: {
+      name: 'Max', email: 'Max@genzic.ai', role: 'CSIO',
+      keywords: ['data', 'analysis', 'market', 'technical', 'strategy', 'financial', 'revenue', 'metrics', 'performance', 'competitive', 'intelligence', 'pressure', 'aggressive', 'liquidity', 'invest', 'roi', 'forecast']
+    },
+    brittany: {
+      name: 'Brittany', email: 'Brittany@genzic.ai', role: 'CMBO',
+      keywords: ['brand', 'creative', 'marketing', 'social', 'content', 'outreach', 'campaign', 'announce', 'newsletter', 'partnership offer', 'introduce', 'welcome', 'follow up', 'check in', 'update', 'proposal']
+    },
+    brigitte: {
+      name: 'Brigitte', email: 'Brigitte@genzic.ai', role: 'CSIA',
+      keywords: ['negotiat', 'strategic', 'contract', 'legal', 'executive', 'complex', 'decision', 'approve', 'final', 'close', 'seal', 'terms', 'agreement', 'escalat', 'sensitive', 'confidential', 'critical', 'slot', 'deadline', 'pressure', 'ultimatum']
+    }
+  };
+
+  // ── MODE SWITCH ─────────────────────────────────────────────────────
+  function setMode(mode) {
+    currentMode = mode;
+    const manualBtn = document.getElementById('manualModeBtn');
+    const autoBtn = document.getElementById('autoModeBtn');
+    const banner = document.getElementById('autoBanner');
+    const gridSection = document.getElementById('agentGridSection');
+    const routingBox = document.getElementById('routingAnalysis');
+    const promptLabel = document.getElementById('promptLabel');
+
+    if (mode === 'auto') {
+      manualBtn.className = 'mode-btn';
+      autoBtn.className = 'mode-btn active-auto';
+      banner.classList.add('visible');
+      gridSection.style.display = 'none';
+      promptLabel.textContent = '02 — Your Voice Command';
+      autoAnalyze();
+    } else {
+      manualBtn.className = 'mode-btn active-manual';
+      autoBtn.className = 'mode-btn';
+      banner.classList.remove('visible');
+      gridSection.style.display = 'block';
+      promptLabel.textContent = '03 — Your Voice Command';
+      routingBox.classList.remove('visible');
+      document.querySelectorAll('.agent-btn').forEach(b => b.classList.remove('auto-selected'));
+    }
+  }
+
+  // ── AGENT SELECT (manual) ───────────────────────────────────────────
+  function selectAgent(btn) {
+    if (currentMode === 'auto') return;
+    document.querySelectorAll('.agent-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedAgent = { name: btn.dataset.agent, email: btn.dataset.email, role: btn.dataset.role };
+  }
+
+  // ── AUTO-ANALYZE ────────────────────────────────────────────────────
+  function autoAnalyze() {
+    if (currentMode !== 'auto') return;
+    clearTimeout(analyzeTimer);
+    const prompt = document.getElementById('promptInput').value.trim();
+    if (prompt.length < 10) {
+      document.getElementById('routingAnalysis').classList.remove('visible');
+      return;
+    }
+    analyzeTimer = setTimeout(() => doAutoRoute(prompt), 600);
+  }
+
+  function doAutoRoute(prompt) {
+    const lower = prompt.toLowerCase();
+    let scores = { max: 0, brittany: 0, brigitte: 0 };
+
+    for (const [key, agent] of Object.entries(BIG_THREE)) {
+      agent.keywords.forEach(kw => { if (lower.includes(kw)) scores[key]++; });
+    }
+
+    const winner = Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
+    const agent = BIG_THREE[winner];
+    selectedAgent = { name: agent.name, email: agent.email, role: agent.role };
+
+    // Update UI
+    document.querySelectorAll('.agent-btn').forEach(b => {
+      b.classList.remove('auto-selected', 'active');
+      if (b.dataset.agent === agent.name) b.classList.add('auto-selected');
+    });
+
+    const reasons = {
+      max: 'data/strategy signals detected → routing to MAX (CSIO)',
+      brittany: 'brand/outreach signals detected → routing to BRITTANY (CMBO)',
+      brigitte: 'executive/negotiation signals detected → routing to BRIGITTE (CSIA)'
+    };
+
+    const resultEl = document.getElementById('routingResult');
+    resultEl.innerHTML = `<strong>→ ${agent.name} (${agent.role})</strong> selected. ${reasons[winner]}.`;
+    document.getElementById('routingAnalysis').classList.add('visible');
+    addLog('auto', `Auto-routed to ${agent.name} — ${reasons[winner]}`);
+  }
+
+  // ── GENERATE ────────────────────────────────────────────────────────
+  async function generateEmail() {
+    const prompt = document.getElementById('promptInput').value.trim();
+    const recipient = document.getElementById('recipientEmail').value.trim();
+
+    if (!prompt) return addLog('error', 'Voice command is empty');
+    if (!recipient) return addLog('error', 'Recipient email required');
+
+    if (currentMode === 'auto') doAutoRoute(prompt);
+
+    const btn = document.getElementById('fireBtn');
+    btn.disabled = true;
+    btn.classList.add('loading');
+    btn.innerHTML = '<span class="spinner"></span> Generating...';
+
+    addLog('info', `${selectedAgent.name} drafting → ${recipient}`);
+
+    const agentDescriptions = {
+      Max: 'Chief Strategy and Intelligence Officer — analytical, data-driven, aggressive and direct. Favors bold decisive language.',
+      Brittany: 'Chief Marketing and Brand Officer — creative, warm, brand-aligned, versatile. Balances professionalism with personality.',
+      Brigitte: 'Chief Strategic Intelligence Advisor — deeply strategic, nuanced, elite executive tone. Masters complex negotiations.',
+      Victoria: 'Chief Technology and Execution Officer — precise, execution-focused, technology-forward.',
+      Joshua: 'Chief Revenue Operations Officer — revenue-focused, client success oriented, relationship-driven.',
+      Sarah: 'Analytical Operations Agent — sharp, fast, data-backed, operational clarity.',
+      Grayson: 'Chief Client Acquisition Officer — outbound focused, persuasive, lead-generation expertise.',
+      Mason: 'Chief Delivery and Fulfillment Officer — delivery-focused, results-oriented, project execution.',
+      Winston: 'Chief Operations Officer — operations-focused, automation-obsessed, flywheel systems thinker. Runs the internal machine.',
+      Preston: 'Chief Design Officer — visual-first, creative direction, brand aesthetics, design systems and graphic workflow.',
+      Heidi: 'Fast Triage and Routing Agent — lightning-quick, concise, direct. Cuts through noise and gets to the answer fast.',
+      Becky: 'Abacus.AI Predictive Analytics Agent — data-science driven, ROI-focused, quantitative. Leads with numbers, models, and proof.'
+    };
+
+    const desc = agentDescriptions[selectedAgent.name] || 'Senior executive officer';
+
+    const systemPrompt = `You are ${selectedAgent.name} (${selectedAgent.email}), ${desc} at Genzic.AI and TanXUSA.com.
+
+Respond ONLY with a valid JSON object. No markdown, no preamble, no extra text. No code fences.
+
+Required JSON fields:
+{
+  "subject": "professional email subject line",
+  "body": "full polished executive email — formal opening, clear body, decisive CTA, professional signature as ${selectedAgent.name} | ${selectedAgent.role || 'Executive'} | Genzic.AI",
+  "reason": "concise 1-sentence audit log entry for the GENZIC Vault"
+}
+
+Rules:
+- American spelling
+- C-suite executive tone matching ${selectedAgent.name}'s personality
+- No fluff — every sentence earns its place
+- Clear call to action`;
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: `Mission: ${prompt}\nRecipient: ${recipient}\nAgent identity: ${selectedAgent.name} <${selectedAgent.email}>` }]
+        })
+      });
+
+      const data = await res.json();
+      const raw = data.content?.find(c => c.type === 'text')?.text || '';
+      const clean = raw.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(clean);
+
+      generatedEmail = { from: selectedAgent.email, to: recipient, subject: parsed.subject, body: parsed.body, reason: parsed.reason };
+      showPreview(generatedEmail);
+      addLog('success', `Generated: "${parsed.subject}"`);
+
+    } catch (err) {
+      addLog('error', 'Generation failed: ' + err.message);
+    }
+
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    btn.innerHTML = '⚡ Generate &amp; Preview';
+  }
+
+  // ── PREVIEW ─────────────────────────────────────────────────────────
+  function showPreview(email) {
+    document.getElementById('prevFrom').textContent = email.from;
+    document.getElementById('prevTo').textContent = email.to;
+    document.getElementById('prevSubject').textContent = email.subject;
+    document.getElementById('prevReason').textContent = email.reason;
+    document.getElementById('prevBody').textContent = email.body;
+    document.getElementById('agentFromDisplay').textContent = email.from;
+    const panel = document.getElementById('previewPanel');
+    panel.classList.add('visible');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // ── SEND ─────────────────────────────────────────────────────────────
+  async function sendEmail() {
+    if (!generatedEmail) return;
+    const btn = document.getElementById('sendBtn');
+    btn.disabled = true;
+    btn.textContent = 'Firing...';
+    addLog('info', 'Posting to Execution Engine...');
+
+    try {
+      // Ensure reason is never empty
+      const safeReason = (generatedEmail.reason && generatedEmail.reason.trim())
+        ? generatedEmail.reason.trim()
+        : 'Autonomous C-Suite Dispatch — ' + selectedAgent.name;
+
+      const firePayload = {
+        to:      generatedEmail.to,
+        subject: generatedEmail.subject,
+        body:    generatedEmail.body,
+        from:    generatedEmail.from,
+        reason:  safeReason
+      };
+
+      addLog('info', '⚡ Firing → ' + firePayload.to + ' | Agent: ' + firePayload.from);
+      addLog('info', '📋 Reason: ' + safeReason);
+
+      // Victoria's Fix: Send as form-encoded, not JSON.
+      // With mode:'no-cors', JSON triggers a CORS preflight that Apps Script rejects
+      // — the body arrives as undefined (the "Silent Payload Crash").
+      // application/x-www-form-urlencoded is a "simple request" — no preflight,
+      // payload lands cleanly in e.parameter on the Apps Script side.
+      const formBody = Object.keys(firePayload)
+        .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(firePayload[k]))
+        .join('&');
+
+      await fetch(API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formBody
+      });
+
+      addLog('success', '✓ Dispatched to Execution Engine');
+      addLog('success', '✓ Target: ' + generatedEmail.to);
+      addLog('success', '✓ Vault reason locked: "' + safeReason + '"');
+      showSuccessFlash();
+      document.getElementById('previewPanel').classList.remove('visible');
+      document.getElementById('promptInput').value = '';
+      document.getElementById('recipientEmail').value = '';
+      updateCharCount();
+      generatedEmail = null;
+
+    } catch (err) {
+      addLog('error', 'Dispatch failed: ' + err.message);
+    }
+
+    btn.disabled = false;
+    btn.textContent = '🚀 Fire to Gateway';
+  }
+
+  function regenerate() {
+    document.getElementById('previewPanel').classList.remove('visible');
+    generatedEmail = null;
+    generateEmail();
+  }
+
+  // ── TABS ─────────────────────────────────────────────────────────────
+  function switchTab(id, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // ── COPY ─────────────────────────────────────────────────────────────
+  function copyText(id, btn) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ Copied!';
+      btn.style.color = 'var(--green)';
+      setTimeout(() => { btn.textContent = '⎘ Copy Template'; btn.style.color = ''; }, 2000);
+    });
+  }
+
+  // ── HELPERS ───────────────────────────────────────────────────────────
+  function updateCharCount() {
+    document.getElementById('charCount').textContent = document.getElementById('promptInput').value.length + ' chr';
+  }
+
+  function addLog(type, msg) {
+    logEvents.unshift({ type, msg, time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) });
+    const container = document.getElementById('logEntries');
+    container.innerHTML = '';
+    logEvents.slice(0, 20).forEach(e => {
+      const div = document.createElement('div');
+      div.className = 'log-entry';
+      div.innerHTML = `<span class="log-time">${e.time}</span><span class="log-msg ${e.type}">${e.msg}</span>`;
+      container.appendChild(div);
+    });
+    document.getElementById('logCount').textContent = logEvents.length + ' events';
+  }
+
+  function showSuccessFlash() {
+    const el = document.getElementById('successFlash');
+    el.classList.add('visible');
+    setTimeout(() => el.classList.remove('visible'), 3500);
+  }
+</script>
+</body>
+</html>
