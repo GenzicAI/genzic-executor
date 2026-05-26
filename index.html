@@ -1279,25 +1279,15 @@ Rules:
 - Clear call to action`;
 
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: systemPrompt,
-          messages: [{ role: 'user', content: `Mission: ${prompt}\nRecipient: ${recipient}\nAgent identity: ${selectedAgent.name} <${selectedAgent.email}>` }]
-        })
-      });
-
+      // Victoria Fix: proxy Claude API through Apps Script (server-side) to bypass CORS
+      const formBody = ['action=generate','prompt='+encodeURIComponent(prompt),'recipient='+encodeURIComponent(recipient),'agentName='+encodeURIComponent(selectedAgent.name),'agentEmail='+encodeURIComponent(selectedAgent.email),'agentRole='+encodeURIComponent(selectedAgent.role||'Executive')].join('&');
+      const res = await fetch(API_URL, {method:'POST',mode:'cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:formBody});
       const data = await res.json();
-      const raw = data.content?.find(c => c.type === 'text')?.text || '';
-      const clean = raw.replace(/```json|```/g, '').trim();
-      const parsed = JSON.parse(clean);
-
-      generatedEmail = { from: selectedAgent.email, to: recipient, subject: parsed.subject, body: parsed.body, reason: parsed.reason };
+      if (data.status==='error') throw new Error(data.message||'Engine error');
+      if (data.status!=='generated') throw new Error('Bad response: '+JSON.stringify(data));
+      generatedEmail = {from:data.from,to:data.to,subject:data.subject,body:data.body,reason:data.reason};
       showPreview(generatedEmail);
-      addLog('success', `Generated: "${parsed.subject}"`);
+      addLog('success', `Generated: "${data.subject}"`);
 
     } catch (err) {
       addLog('error', 'Generation failed: ' + err.message);
