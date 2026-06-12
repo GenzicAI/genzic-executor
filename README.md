@@ -19,7 +19,7 @@ Built with **Next.js 15 (App Router) · TypeScript · Tailwind CSS · shadcn/ui 
 
 ## Core features
 
-- **Industry Selector** — first screen, 4 niches + links to genzic.ai & 10xusa.com.
+- **Industry Selector** — first screen, 4 niches + links to genzic.ai & tanxusa.com.
 - **Dynamic dashboards** — stats, filters, lead feed, and templates all driven per niche.
 - **Lead discovery & AI scoring** — scored, sortable, filterable lead feed.
 - **Automated outreach** — email & SMS templates with live token personalization.

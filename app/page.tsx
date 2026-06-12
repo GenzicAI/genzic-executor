@@ -79,8 +79,8 @@ export default function IndustrySelectorPage() {
             </a>
           </Button>
           <Button asChild size="lg" variant="outline" className="flex-1">
-            <a href="https://10xusa.com" target="_blank" rel="noreferrer">
-              Visit 10X USA <ExternalLink className="h-4 w-4" />
+            <a href="https://tanxusa.com/" target="_blank" rel="noreferrer">
+              Visit TanXUSA <ExternalLink className="h-4 w-4" />
             </a>
           </Button>
         </footer>
