@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   LayoutDashboard,
   Users,
+  KanbanSquare,
   Megaphone,
   BarChart3,
   Settings,
@@ -21,6 +22,8 @@ import { StatCard } from "./StatCard";
 import { LeadCard } from "./LeadCard";
 import { FilterSheet } from "./FilterSheet";
 import { TemplatePanel } from "./TemplatePanel";
+import { LeadDetailSheet } from "./LeadDetailSheet";
+import { PipelineBoard } from "./PipelineBoard";
 import { CampaignsPanel } from "./CampaignsPanel";
 import { AnalyticsPanel } from "./AnalyticsPanel";
 import { SettingsPanel } from "./SettingsPanel";
@@ -29,11 +32,12 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-type TabId = "dashboard" | "leads" | "campaigns" | "analytics" | "settings";
+type TabId = "dashboard" | "leads" | "pipeline" | "campaigns" | "analytics" | "settings";
 
 const TABS: { id: TabId; label: string; icon: typeof Users }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "leads", label: "Leads", icon: Users },
+  { id: "pipeline", label: "Pipeline", icon: KanbanSquare },
   { id: "campaigns", label: "Campaigns", icon: Megaphone },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "settings", label: "Settings", icon: Settings },
@@ -51,25 +55,22 @@ export function DashboardShell({ nicheId }: DashboardShellProps) {
   const [activeTab, setActiveTab] = useState<TabId>("dashboard");
   const [filterOpen, setFilterOpen] = useState(false);
   const [tplOpen, setTplOpen] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
   const [filters, setFilters] = useState<FiltersState>({});
   const [location, setLocation] = useState("");
   const [search, setSearch] = useState("");
   const [sendTarget, setSendTarget] = useState<Lead | null>(null);
+  const [detailLeadId, setDetailLeadId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const [contactedIds, setContactedIds] = useState<Set<string>>(new Set());
 
-  // Stable mock feed for this niche.
-  const allLeads = useMemo(() => niche.generateLeads(24), [niche]);
+  // Mutable lead store for this niche (CRM state lives here).
+  const [leads, setLeads] = useState<Lead[]>(() => niche.generateLeads(24));
 
-  // Reset transient state whenever the niche changes (defensive — the page
-  // remounts per niche, but this keeps the component correct if reused).
-  useEffect(() => {
-    setFilters({});
-    setLocation("");
-    setSearch("");
-    setActiveTab("dashboard");
-    setContactedIds(new Set());
-  }, [niche.id]);
+  // Keep the open detail sheet in sync with the latest lead data.
+  const detailLead = useMemo(
+    () => leads.find((l) => l.id === detailLeadId) ?? null,
+    [leads, detailLeadId],
+  );
 
   // Auto-dismiss toast.
   useEffect(() => {
@@ -88,22 +89,14 @@ export function DashboardShell({ nicheId }: DashboardShellProps) {
   }, [filters, location, niche.filters]);
 
   const filteredLeads = useMemo(() => {
-    const decorated = allLeads.map((l) =>
-      contactedIds.has(l.id) && l.status === "new"
-        ? { ...l, status: "contacted" as const }
-        : l,
-    );
-    return decorated.filter((lead) => {
-      // Location (substring match on city/state).
+    return leads.filter((lead) => {
       if (location.trim() && !lead.location.toLowerCase().includes(location.trim().toLowerCase())) {
         return false;
       }
-      // Free-text search across name, summary and tags.
       if (search.trim()) {
         const hay = `${lead.name} ${lead.summary} ${lead.tags.join(" ")}`.toLowerCase();
         if (!hay.includes(search.trim().toLowerCase())) return false;
       }
-      // Niche filters (select + multi apply against lead.attrs; range is informational).
       for (const f of niche.filters) {
         const v = filters[f.id];
         if (f.type === "select" && typeof v === "string" && v) {
@@ -115,17 +108,24 @@ export function DashboardShell({ nicheId }: DashboardShellProps) {
       }
       return true;
     });
-  }, [allLeads, contactedIds, location, search, filters, niche.filters]);
+  }, [leads, location, search, filters, niche.filters]);
 
-  // Headline stats computed from the full feed.
+  // Headline stats as a funnel computed from live lead state.
   const statValues = useMemo(() => {
-    const found = allLeads.length;
-    const qualified = allLeads.filter((l) => l.status === "qualified").length;
-    const contacted =
-      allLeads.filter((l) => l.status === "contacted").length + contactedIds.size;
-    const converted = allLeads.filter((l) => l.status === "converted").length;
-    return { found, qualified, contacted, converted };
-  }, [allLeads, contactedIds]);
+    const rank: Record<Lead["status"], number> = {
+      new: 0,
+      qualified: 1,
+      contacted: 2,
+      converted: 3,
+    };
+    const atLeast = (s: Lead["status"]) => leads.filter((l) => rank[l.status] >= rank[s]).length;
+    return {
+      found: leads.length,
+      qualified: atLeast("qualified"),
+      contacted: atLeast("contacted"),
+      converted: atLeast("converted"),
+    };
+  }, [leads]);
 
   const valueForStat = (kind: string, fallback?: number) => {
     switch (kind) {
@@ -142,6 +142,13 @@ export function DashboardShell({ nicheId }: DashboardShellProps) {
     }
   };
 
+  // ── Mutators ──
+  const updateLeadStatus = (id: string, status: Lead["status"]) =>
+    setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, status } : l)));
+
+  const saveNotes = (id: string, notes: string) =>
+    setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, notes } : l)));
+
   // ── Handlers (explicit & stable) ──
   const openFiltersSheet = () => setFilterOpen(true);
   const openTemplatesGeneric = () => {
@@ -152,13 +159,19 @@ export function DashboardShell({ nicheId }: DashboardShellProps) {
     setSendTarget(lead);
     setTplOpen(true);
   };
+  const handleViewLead = (lead: Lead) => {
+    setDetailLeadId(lead.id);
+    setDetailOpen(true);
+  };
   const resetFilters = () => {
     setFilters({});
     setLocation("");
   };
   const handleSent = ({ leadId, message }: { leadId: string | null; message: string }) => {
     if (leadId) {
-      setContactedIds((prev) => new Set(prev).add(leadId));
+      setLeads((prev) =>
+        prev.map((l) => (l.id === leadId && l.status === "new" ? { ...l, status: "contacted" } : l)),
+      );
     }
     setToast(message);
   };
@@ -182,7 +195,13 @@ export function DashboardShell({ nicheId }: DashboardShellProps) {
         </div>
       ) : (
         filteredLeads.map((lead) => (
-          <LeadCard key={lead.id} lead={lead} niche={niche} onContact={handleContact} />
+          <LeadCard
+            key={lead.id}
+            lead={lead}
+            niche={niche}
+            onContact={handleContact}
+            onView={handleViewLead}
+          />
         ))
       )}
     </div>
@@ -212,7 +231,7 @@ export function DashboardShell({ nicheId }: DashboardShellProps) {
           </div>
 
           {/* Desktop tab nav */}
-          <nav className="hidden items-center gap-1 md:flex">
+          <nav className="hidden items-center gap-1 lg:flex">
             {TABS.map((t) => {
               const Icon = t.icon;
               return (
@@ -236,7 +255,7 @@ export function DashboardShell({ nicheId }: DashboardShellProps) {
       </header>
 
       {/* ── Main ── */}
-      <main className="container relative z-10 pb-28 pt-5 md:pb-12">
+      <main className="container relative z-10 pb-28 pt-5 lg:pb-12">
         {(activeTab === "dashboard" || activeTab === "leads") && (
           <div className="space-y-5">
             <div>
@@ -299,16 +318,24 @@ export function DashboardShell({ nicheId }: DashboardShellProps) {
           </div>
         )}
 
+        {activeTab === "pipeline" && (
+          <PipelineBoard
+            niche={niche}
+            leads={leads}
+            onOpenLead={handleViewLead}
+            onAdvance={updateLeadStatus}
+          />
+        )}
         {activeTab === "campaigns" && (
           <CampaignsPanel niche={niche} onNewCampaign={openTemplatesGeneric} />
         )}
-        {activeTab === "analytics" && <AnalyticsPanel niche={niche} leads={allLeads} />}
+        {activeTab === "analytics" && <AnalyticsPanel niche={niche} leads={leads} />}
         {activeTab === "settings" && <SettingsPanel niche={niche} />}
       </main>
 
       {/* ── Mobile bottom nav ── */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur md:hidden">
-        <div className="pb-safe grid grid-cols-5">
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur lg:hidden">
+        <div className="pb-safe grid grid-cols-6">
           {TABS.map((t) => {
             const Icon = t.icon;
             const active = activeTab === t.id;
@@ -318,7 +345,7 @@ export function DashboardShell({ nicheId }: DashboardShellProps) {
                 type="button"
                 onClick={() => setActiveTab(t.id)}
                 className={cn(
-                  "flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium transition-colors",
+                  "flex flex-col items-center gap-1 py-2.5 text-[9px] font-medium transition-colors",
                   active ? "text-niche" : "text-muted-foreground",
                 )}
               >
@@ -349,10 +376,19 @@ export function DashboardShell({ nicheId }: DashboardShellProps) {
         lead={sendTarget}
         onSent={handleSent}
       />
+      <LeadDetailSheet
+        niche={niche}
+        lead={detailLead}
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        onStatusChange={updateLeadStatus}
+        onSaveNotes={saveNotes}
+        onContact={handleContact}
+      />
 
       {/* ── Toast ── */}
       {toast && (
-        <div className="fixed bottom-20 left-1/2 z-50 -translate-x-1/2 md:bottom-6">
+        <div className="fixed bottom-20 left-1/2 z-50 -translate-x-1/2 lg:bottom-6">
           <div className="flex items-center gap-2 rounded-full border border-niche/40 bg-card px-4 py-2.5 text-sm shadow-lg">
             <CheckCircle2 className="h-4 w-4 text-niche" />
             <span className="max-w-[80vw] truncate">{toast}</span>

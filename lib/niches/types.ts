@@ -58,6 +58,8 @@ export interface Lead {
   /** Raw attribute map used for client-side filtering. */
   attrs: Record<string, string | number>;
   createdAgo: string;
+  /** Free-form notes added by the user (CRM). */
+  notes?: string;
 }
 
 export interface NicheConfig {

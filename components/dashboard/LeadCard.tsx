@@ -12,6 +12,7 @@ interface LeadCardProps {
   lead: Lead;
   niche: NicheConfig;
   onContact: (lead: Lead) => void;
+  onView: (lead: Lead) => void;
 }
 
 const STATUS_STYLE: Record<Lead["status"], { label: string; cls: string }> = {
@@ -27,7 +28,7 @@ function scoreColor(score: number) {
   return "text-muted-foreground";
 }
 
-export function LeadCard({ lead, niche, onContact }: LeadCardProps) {
+export function LeadCard({ lead, niche, onContact, onView }: LeadCardProps) {
   const status = STATUS_STYLE[lead.status];
 
   return (
@@ -94,7 +95,7 @@ export function LeadCard({ lead, niche, onContact }: LeadCardProps) {
         >
           <Send className="h-4 w-4" /> Contact
         </Button>
-        <Button size="sm" variant="outline" className="flex-1">
+        <Button size="sm" variant="outline" className="flex-1" onClick={() => onView(lead)}>
           View profile
         </Button>
       </div>
