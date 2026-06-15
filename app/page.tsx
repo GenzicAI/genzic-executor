@@ -1,4 +1,4 @@
-import { ExternalLink, Sparkles } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { IndustryPicker } from "@/components/IndustryPicker";
 
@@ -10,9 +10,10 @@ export default function IndustrySelectorPage() {
 
       <div className="container relative z-10 flex min-h-dvh flex-col py-10">
         {/* Brand */}
-        <div className="flex items-center justify-center gap-2 text-sm font-medium text-muted-foreground">
-          <Sparkles className="h-4 w-4 text-primary" />
-          Genzic.AI
+        <div className="flex items-center justify-center gap-2.5 text-base font-semibold">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.svg" alt="Genzic.AI" width={32} height={32} className="h-8 w-8" />
+          <span className="text-muted-foreground">Genzic.AI</span>
         </div>
 
         {/* Hero */}

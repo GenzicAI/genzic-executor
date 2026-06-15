@@ -42,15 +42,17 @@ interface TemplatePanelProps {
  * personalized; lead attributes ({{goal}}, {{concern}}, …) come from the lead.
  */
 function hydrate(text: string, lead: Lead | null, profile: Profile) {
-  const sender = firstName(profile) || "your coach";
+  // Use the user's complete name in sign-offs so nothing is dropped.
+  const senderName = profile.fullName.trim();
   const business = profile.businessName.trim();
   const map: Record<string, string> = {
     name: lead?.name?.split(" ")[0] ?? "there",
-    // Sender name tokens used across niches all resolve to the user's name.
-    trainer: firstName(profile) || "Alex",
-    esthetician: firstName(profile) || "Jordan",
-    agent: firstName(profile) || "Sam",
-    sender,
+    // Sender name tokens used across niches all resolve to the user's full name.
+    trainer: senderName || "Alex",
+    esthetician: senderName || "Jordan",
+    agent: senderName || "Sam",
+    sender: senderName || "your coach",
+    firstName: firstName(profile) || senderName,
     // Business name tokens.
     company: business || "Apex",
     ...profileTokens(profile),
@@ -76,8 +78,10 @@ function withSignature(body: string, channel: "email" | "sms", profile: Profile)
   if (channel !== "email") return body;
   const footer = socialFooter(profile);
   const business = profile.businessName.trim();
+  const email = profile.email.trim();
   const lines: string[] = [];
   if (business) lines.push(business);
+  if (email) lines.push(email);
   if (footer) lines.push(footer);
   return lines.length ? `${body}\n\n${lines.join("\n")}` : body;
 }

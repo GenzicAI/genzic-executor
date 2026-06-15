@@ -181,6 +181,16 @@ export function DashboardShell({ nicheId }: DashboardShellProps) {
 
   const NicheIcon = niche.icon;
 
+  const profileInitials = (() => {
+    const source = profile.fullName.trim() || profile.businessName.trim();
+    if (!source) return "";
+    return source
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase() ?? "")
+      .join("");
+  })();
+
   const rootStyle = {
     "--niche": niche.accent,
     "--niche-foreground": "240 10% 6%",
@@ -235,27 +245,51 @@ export function DashboardShell({ nicheId }: DashboardShellProps) {
             </div>
           </div>
 
-          {/* Desktop tab nav */}
-          <nav className="hidden items-center gap-1 lg:flex">
-            {TABS.map((t) => {
-              const Icon = t.icon;
-              return (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => setActiveTab(t.id)}
-                  className={cn(
-                    "flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                    activeTab === t.id
-                      ? "bg-niche/15 text-niche"
-                      : "text-muted-foreground hover:bg-accent hover:text-foreground",
-                  )}
-                >
-                  <Icon className="h-4 w-4" /> {t.label}
-                </button>
-              );
-            })}
-          </nav>
+          <div className="flex items-center gap-1">
+            {/* Profile button — always available, primary entry on mobile */}
+            <button
+              type="button"
+              onClick={() => setActiveTab("settings")}
+              aria-label="Your profile & settings"
+              className={cn(
+                "relative grid h-9 w-9 shrink-0 place-items-center rounded-full border text-xs font-semibold transition-colors lg:hidden",
+                activeTab === "settings"
+                  ? "border-niche bg-niche/15 text-niche"
+                  : "border-border bg-muted text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {profileInitials ? (
+                profileInitials
+              ) : (
+                <UserRound className="h-4.5 w-4.5" />
+              )}
+              {ready && !isComplete && (
+                <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-niche" />
+              )}
+            </button>
+
+            {/* Desktop tab nav */}
+            <nav className="hidden items-center gap-1 lg:flex">
+              {TABS.map((t) => {
+                const Icon = t.icon;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setActiveTab(t.id)}
+                    className={cn(
+                      "flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                      activeTab === t.id
+                        ? "bg-niche/15 text-niche"
+                        : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                    )}
+                  >
+                    <Icon className="h-4 w-4" /> {t.label}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
         </div>
       </header>
 

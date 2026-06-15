@@ -60,6 +60,19 @@ export function ProfileForm() {
           </div>
         </div>
 
+        <div className="space-y-2">
+          <Label htmlFor="pf-email">Email address</Label>
+          <Input
+            id="pf-email"
+            type="email"
+            inputMode="email"
+            value={profile.email}
+            onChange={(e) => setProfile({ email: e.target.value })}
+            placeholder="you@yourbusiness.com"
+            autoComplete="email"
+          />
+        </div>
+
         <div>
           <Label className="text-xs uppercase tracking-wide text-muted-foreground">
             Social handles
@@ -81,14 +94,20 @@ export function ProfileForm() {
           </div>
         </div>
 
-        {(profile.businessName.trim() || footerPreview) && (
+        {(profile.fullName.trim() || profile.businessName.trim() || profile.email.trim() || footerPreview) && (
           <div className="rounded-lg border border-border bg-muted/40 p-3">
             <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Email signature preview
             </p>
             <p className="text-sm">
+              {profile.fullName.trim() && (
+                <span className="block font-medium">{profile.fullName.trim()}</span>
+              )}
               {profile.businessName.trim() && (
-                <span className="block font-medium">{profile.businessName.trim()}</span>
+                <span className="block text-muted-foreground">{profile.businessName.trim()}</span>
+              )}
+              {profile.email.trim() && (
+                <span className="block text-muted-foreground">{profile.email.trim()}</span>
               )}
               {footerPreview && <span className="block text-muted-foreground">{footerPreview}</span>}
             </p>
@@ -99,6 +118,7 @@ export function ProfileForm() {
           Tokens available in templates:{" "}
           <code className="rounded bg-muted px-1 py-0.5">{"{{name}}"}</code>{" "}
           <code className="rounded bg-muted px-1 py-0.5">{"{{business}}"}</code>{" "}
+          <code className="rounded bg-muted px-1 py-0.5">{"{{email}}"}</code>{" "}
           <code className="rounded bg-muted px-1 py-0.5">{"{{instagram}}"}</code>{" "}
           <code className="rounded bg-muted px-1 py-0.5">{"{{tiktok}}"}</code>
         </p>

@@ -12,6 +12,7 @@ import {
 export interface Profile {
   fullName: string;
   businessName: string;
+  email: string;
   instagram: string;
   tiktok: string;
   facebook: string;
@@ -21,6 +22,7 @@ export interface Profile {
 export const EMPTY_PROFILE: Profile = {
   fullName: "",
   businessName: "",
+  email: "",
   instagram: "",
   tiktok: "",
   facebook: "",
@@ -111,6 +113,7 @@ export function socialFooter(p: Profile): string {
 export function profileTokens(p: Profile): Record<string, string> {
   return {
     business: p.businessName.trim(),
+    email: p.email.trim(),
     instagram: at(p.instagram),
     tiktok: at(p.tiktok),
     facebook: p.facebook.trim(),
