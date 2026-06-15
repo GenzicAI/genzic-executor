@@ -74,7 +74,11 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       profile,
       setProfile,
       ready,
-      isComplete: Boolean(profile.fullName.trim() || profile.businessName.trim()),
+      // "Complete" means the essentials are filled, so the finish-profile
+      // prompt persists until name, business, and email are all set.
+      isComplete: Boolean(
+        profile.fullName.trim() && profile.businessName.trim() && profile.email.trim(),
+      ),
     }),
     [profile, ready],
   );

@@ -297,13 +297,6 @@ export function DashboardShell({ nicheId }: DashboardShellProps) {
       <main className="container relative z-10 pb-28 pt-5 lg:pb-12">
         {(activeTab === "dashboard" || activeTab === "leads") && (
           <div className="space-y-5">
-            <div>
-              <h2 className="text-xl font-bold tracking-tight">
-                {activeTab === "dashboard" ? "Overview" : "Lead Feed"}
-              </h2>
-              <p className="text-sm text-muted-foreground">{niche.tagline}</p>
-            </div>
-
             {ready && !isComplete && (
               <button
                 type="button"
@@ -316,12 +309,19 @@ export function DashboardShell({ nicheId }: DashboardShellProps) {
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-medium">Finish setting up your profile</span>
                   <span className="block text-xs text-muted-foreground">
-                    Add your name, business & social handles to auto-personalize every message.
+                    Add your name, business & email to auto-personalize every message.
                   </span>
                 </span>
                 <span className="shrink-0 text-sm font-medium text-niche">Set up →</span>
               </button>
             )}
+
+            <div>
+              <h2 className="text-xl font-bold tracking-tight">
+                {activeTab === "dashboard" ? "Overview" : "Lead Feed"}
+              </h2>
+              <p className="text-sm text-muted-foreground">{niche.tagline}</p>
+            </div>
 
             {activeTab === "dashboard" && (
               <div
