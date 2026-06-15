@@ -7,14 +7,14 @@ interface LogoProps {
 }
 
 /**
- * The Genzic.AI brand mark. Served from /logo.svg so it can be swapped for an
- * exact brand asset (e.g. public/logo.png) without touching call sites.
+ * The official Genzic.AI brand mark (public/logo.png). Centralized here so
+ * every call site (top nav, Industry Selector) stays in sync.
  */
 export function Logo({ size = 40, className }: LogoProps) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src="/logo.svg"
+      src="/logo.png"
       alt="Genzic.AI"
       width={size}
       height={size}
