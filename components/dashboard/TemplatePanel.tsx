@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Mail, MessageSquare, Send, Loader2, Check } from "lucide-react";
+import { Mail, MessageSquare, Send, Loader2, Check, Copy } from "lucide-react";
 import type { NicheConfig, Lead, TemplateDef } from "@/lib/niches/types";
 import { dispatchOutreach } from "@/lib/integrations";
 import {
@@ -100,6 +100,7 @@ export function TemplatePanel({
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   // Re-hydrate the editor whenever the template, target lead, niche, or the
   // user's profile changes — so personalization stays in sync.
@@ -114,6 +115,31 @@ export function TemplatePanel({
   useEffect(() => {
     setActiveId(niche.templates[0]?.id ?? "");
   }, [niche.id, niche.templates]);
+
+  const handleCopy = async () => {
+    if (!active) return;
+    const text =
+      active.channel === "email" && subject ? `Subject: ${subject}\n\n${body}` : body;
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // Fallback for browsers without async clipboard access.
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } catch {
+        /* ignore */
+      }
+      document.body.removeChild(ta);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1600);
+  };
 
   const handleSend = async () => {
     if (!active) return;
@@ -203,7 +229,24 @@ export function TemplatePanel({
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="tpl-body">Message</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="tpl-body">Message</Label>
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="h-3.5 w-3.5 text-niche" /> Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3.5 w-3.5" /> Copy
+                      </>
+                    )}
+                  </button>
+                </div>
                 <Textarea
                   id="tpl-body"
                   value={body}

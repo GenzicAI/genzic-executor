@@ -40,8 +40,8 @@ export function CampaignsPanel({ niche, onNewCampaign }: CampaignsPanelProps) {
         <CardContent className="flex items-center gap-3 p-4">
           <Zap className="h-5 w-5 text-niche" />
           <p className="text-sm">
-            Every campaign fires through a single <strong>Zapier Catch Hook</strong> that fans out
-            to Resend (email) and Twilio (SMS). Connect it in <strong>Settings → Integrations</strong>.
+            Outreach is fully automated — every campaign sends email & SMS for you through the
+            NicheLead backend. Just write your message and hit send.
           </p>
         </CardContent>
       </Card>

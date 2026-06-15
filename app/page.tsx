@@ -1,8 +1,6 @@
-import Link from "next/link";
-import { ArrowRight, ExternalLink, Sparkles } from "lucide-react";
-import { NICHES } from "@/lib/niches";
+import { ExternalLink, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { IndustryPicker } from "@/components/IndustryPicker";
 
 export default function IndustrySelectorPage() {
   return (
@@ -31,41 +29,12 @@ export default function IndustrySelectorPage() {
           </p>
         </header>
 
-        {/* Industry selector — vertical, scrollable list that scales to 20–30 niches */}
-        <section className="mx-auto mt-10 w-full max-w-xl flex-1">
+        {/* Industry selector — a single dropdown that scales to 30+ niches */}
+        <section className="mx-auto mt-10 w-full max-w-md flex-1">
           <h2 className="mb-4 text-center text-sm font-semibold uppercase tracking-wider text-muted-foreground">
             Choose your industry
           </h2>
-          <div className="space-y-3">
-            {NICHES.map((niche) => {
-              const Icon = niche.icon;
-              return (
-                <Link
-                  key={niche.id}
-                  href={`/dashboard/${niche.id}`}
-                  className="group block focus:outline-none"
-                  style={{ ["--niche" as string]: niche.accent }}
-                >
-                  <Card className="relative flex items-center gap-4 overflow-hidden p-4 transition-all duration-200 hover:border-niche/50 hover:bg-niche/[0.04] group-focus-visible:ring-2 group-focus-visible:ring-niche">
-                    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-niche/15 text-2xl">
-                      {niche.emoji}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <Icon className="h-4 w-4 shrink-0 text-niche" />
-                        <h3 className="font-semibold">{niche.label}</h3>
-                      </div>
-                      <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">
-                        {niche.tagline}
-                      </p>
-                    </div>
-                    <ArrowRight className="h-5 w-5 shrink-0 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:text-niche" />
-                    <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-niche/10 blur-2xl opacity-0 transition-opacity group-hover:opacity-100" />
-                  </Card>
-                </Link>
-              );
-            })}
-          </div>
+          <IndustryPicker />
           <p className="mt-6 text-center text-xs text-muted-foreground">
             More niches coming soon — the platform is built to scale to 30+ industries.
           </p>
@@ -80,7 +49,7 @@ export default function IndustrySelectorPage() {
           </Button>
           <Button asChild size="lg" variant="outline" className="flex-1">
             <a href="https://tanxusa.com/" target="_blank" rel="noreferrer">
-              Visit TanXUSA <ExternalLink className="h-4 w-4" />
+              Visit TanXUSA.com <ExternalLink className="h-4 w-4" />
             </a>
           </Button>
         </footer>
