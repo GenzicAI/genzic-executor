@@ -12,7 +12,13 @@ export default function IndustrySelectorPage() {
         {/* Brand */}
         <div className="flex items-center justify-center gap-2.5 text-base font-semibold">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.svg" alt="Genzic.AI" width={32} height={32} className="h-8 w-8" />
+          <img
+            src="/logo.svg"
+            alt="Genzic.AI"
+            width={40}
+            height={40}
+            className="h-10 w-10 rounded-[10px] shadow-lg shadow-primary/20"
+          />
           <span className="text-muted-foreground">Genzic.AI</span>
         </div>
 
