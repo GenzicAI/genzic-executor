@@ -5,6 +5,13 @@ import { Mail, MessageSquare, Send, Loader2, Check } from "lucide-react";
 import type { NicheConfig, Lead, TemplateDef } from "@/lib/niches/types";
 import { dispatchOutreach } from "@/lib/integrations";
 import {
+  useProfile,
+  firstName,
+  profileTokens,
+  socialFooter,
+  type Profile,
+} from "@/lib/profile";
+import {
   Sheet,
   SheetContent,
   SheetHeader,
@@ -28,14 +35,27 @@ interface TemplatePanelProps {
   onSent: (result: { leadId: string | null; channel: string; message: string }) => void;
 }
 
-/** Fills {{token}} placeholders from the lead + sensible defaults. */
-function hydrate(text: string, lead: Lead | null, niche: NicheConfig) {
+/**
+ * Fills {{token}} placeholders from the lead + the user's profile.
+ * Sender tokens ({{trainer}}, {{agent}}, {{company}}, {{business}}, …) and
+ * social handles ({{instagram}}, …) come from the profile so every message is
+ * personalized; lead attributes ({{goal}}, {{concern}}, …) come from the lead.
+ */
+function hydrate(text: string, lead: Lead | null, profile: Profile) {
+  const sender = firstName(profile) || "your coach";
+  const business = profile.businessName.trim();
   const map: Record<string, string> = {
     name: lead?.name?.split(" ")[0] ?? "there",
-    trainer: "Alex",
-    esthetician: "Jordan",
-    company: "Apex",
-    agent: "Sam",
+    // Sender name tokens used across niches all resolve to the user's name.
+    trainer: firstName(profile) || "Alex",
+    esthetician: firstName(profile) || "Jordan",
+    agent: firstName(profile) || "Sam",
+    sender,
+    // Business name tokens.
+    company: business || "Apex",
+    ...profileTokens(profile),
+    business: business || "our team",
+    // Lead-derived attributes.
     goal: String(lead?.attrs?.goal ?? "your goals"),
     concern: String(lead?.attrs?.concern ?? "your skin concerns"),
     service: String(lead?.attrs?.service ?? "treatment"),
@@ -48,6 +68,20 @@ function hydrate(text: string, lead: Lead | null, niche: NicheConfig) {
   return text.replace(/\{\{(\w+)\}\}/g, (_, k: string) => map[k] ?? `{{${k}}}`);
 }
 
+/**
+ * Appends a business + social-handle footer to email bodies, using whichever
+ * profile fields are filled in. SMS stays short, so it is skipped there.
+ */
+function withSignature(body: string, channel: "email" | "sms", profile: Profile) {
+  if (channel !== "email") return body;
+  const footer = socialFooter(profile);
+  const business = profile.businessName.trim();
+  const lines: string[] = [];
+  if (business) lines.push(business);
+  if (footer) lines.push(footer);
+  return lines.length ? `${body}\n\n${lines.join("\n")}` : body;
+}
+
 export function TemplatePanel({
   niche,
   open,
@@ -55,6 +89,7 @@ export function TemplatePanel({
   lead,
   onSent,
 }: TemplatePanelProps) {
+  const { profile, isComplete } = useProfile();
   const [activeId, setActiveId] = useState<string>(niche.templates[0]?.id ?? "");
   const active: TemplateDef | undefined = useMemo(
     () => niche.templates.find((t) => t.id === activeId) ?? niche.templates[0],
@@ -66,13 +101,14 @@ export function TemplatePanel({
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
-  // Re-hydrate the editor whenever the template, target lead, or niche changes.
+  // Re-hydrate the editor whenever the template, target lead, niche, or the
+  // user's profile changes — so personalization stays in sync.
   useEffect(() => {
     if (!active) return;
-    setSubject(active.subject ? hydrate(active.subject, lead, niche) : "");
-    setBody(hydrate(active.body, lead, niche));
+    setSubject(active.subject ? hydrate(active.subject, lead, profile) : "");
+    setBody(withSignature(hydrate(active.body, lead, profile), active.channel, profile));
     setSent(false);
-  }, [active, lead, niche]);
+  }, [active, lead, profile]);
 
   // Reset to the first template each time the niche changes.
   useEffect(() => {
@@ -117,6 +153,14 @@ export function TemplatePanel({
         </SheetHeader>
 
         <div className="flex-1 space-y-5 overflow-y-auto p-5">
+          {!isComplete && (
+            <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
+              Tip: add your name, business, and social handles in{" "}
+              <span className="font-semibold">Settings → Your Profile</span> to auto-fill these
+              messages.
+            </div>
+          )}
+
           {/* Template chooser */}
           <div className="flex flex-wrap gap-2">
             {niche.templates.map((t) => (

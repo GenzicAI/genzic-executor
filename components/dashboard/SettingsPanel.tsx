@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { ProfileForm } from "./ProfileForm";
 
 interface SettingsPanelProps {
   niche: NicheConfig;
@@ -34,9 +35,11 @@ export function SettingsPanel({ niche }: SettingsPanelProps) {
       <div>
         <h2 className="text-lg font-semibold">Settings</h2>
         <p className="text-sm text-muted-foreground">
-          Integrations and workspace configuration for your {niche.label} workspace.
+          Profile, integrations, and workspace configuration for your {niche.label} workspace.
         </p>
       </div>
+
+      <ProfileForm />
 
       <Card>
         <CardHeader>

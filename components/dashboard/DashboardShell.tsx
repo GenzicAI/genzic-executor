@@ -14,9 +14,11 @@ import {
   Search,
   ChevronLeft,
   CheckCircle2,
+  UserRound,
 } from "lucide-react";
 import type { Lead } from "@/lib/niches/types";
 import { getNiche } from "@/lib/niches";
+import { useProfile } from "@/lib/profile";
 import type { FiltersState } from "./types";
 import { StatCard } from "./StatCard";
 import { LeadCard } from "./LeadCard";
@@ -50,6 +52,7 @@ interface DashboardShellProps {
 
 export function DashboardShell({ nicheId }: DashboardShellProps) {
   const niche = getNiche(nicheId)!;
+  const { profile, isComplete, ready } = useProfile();
 
   // ── Single source of truth for all interactive state ──
   const [activeTab, setActiveTab] = useState<TabId>("dashboard");
@@ -226,7 +229,9 @@ export function DashboardShell({ nicheId }: DashboardShellProps) {
             </span>
             <div className="min-w-0">
               <h1 className="truncate text-base font-semibold leading-tight">{niche.label}</h1>
-              <p className="truncate text-xs text-muted-foreground">NicheLead AI</p>
+              <p className="truncate text-xs text-muted-foreground">
+                {profile.businessName.trim() || "NicheLead AI"}
+              </p>
             </div>
           </div>
 
@@ -264,6 +269,25 @@ export function DashboardShell({ nicheId }: DashboardShellProps) {
               </h2>
               <p className="text-sm text-muted-foreground">{niche.tagline}</p>
             </div>
+
+            {ready && !isComplete && (
+              <button
+                type="button"
+                onClick={() => setActiveTab("settings")}
+                className="flex w-full items-center gap-3 rounded-xl border border-niche/30 bg-niche/[0.06] p-3 text-left transition-colors hover:bg-niche/[0.1]"
+              >
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-niche/15 text-niche">
+                  <UserRound className="h-4.5 w-4.5" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-medium">Finish setting up your profile</span>
+                  <span className="block text-xs text-muted-foreground">
+                    Add your name, business & social handles to auto-personalize every message.
+                  </span>
+                </span>
+                <span className="shrink-0 text-sm font-medium text-niche">Set up →</span>
+              </button>
+            )}
 
             {activeTab === "dashboard" && (
               <div
