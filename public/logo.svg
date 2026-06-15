@@ -1,68 +1,70 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" role="img" aria-label="Genzic.AI logo">
   <defs>
-    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
-      <stop offset="0" stop-color="#2a6b2c"/>
-      <stop offset="0.55" stop-color="#0f3a16"/>
-      <stop offset="1" stop-color="#04120a"/>
+    <radialGradient id="body" cx="50%" cy="34%" r="80%">
+      <stop offset="0" stop-color="#27692b"/>
+      <stop offset="0.5" stop-color="#0f3a17"/>
+      <stop offset="1" stop-color="#04140a"/>
     </radialGradient>
-    <linearGradient id="ring" x1="140" y1="120" x2="380" y2="430" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#9bff7e"/>
-      <stop offset="0.45" stop-color="#28d84e"/>
-      <stop offset="1" stop-color="#0a7a2a"/>
+    <linearGradient id="gloss" x1="256" y1="20" x2="256" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
     </linearGradient>
-    <linearGradient id="ringHi" x1="180" y1="130" x2="320" y2="300" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#eaffd9"/>
-      <stop offset="1" stop-color="#7bf06a" stop-opacity="0"/>
+    <linearGradient id="metal" x1="256" y1="160" x2="256" y2="425" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#c8ff9e"/>
+      <stop offset="0.28" stop-color="#5fe06a"/>
+      <stop offset="0.62" stop-color="#1aa83a"/>
+      <stop offset="1" stop-color="#0a6b27"/>
     </linearGradient>
-    <linearGradient id="letters" x1="256" y1="200" x2="256" y2="360" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#d6ffb0"/>
-      <stop offset="0.5" stop-color="#5fdd4f"/>
-      <stop offset="1" stop-color="#1f9a33"/>
+    <linearGradient id="letters" x1="256" y1="235" x2="256" y2="350" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e7ffc9"/>
+      <stop offset="0.5" stop-color="#62d94f"/>
+      <stop offset="1" stop-color="#178a2c"/>
     </linearGradient>
-    <linearGradient id="edge" x1="0" y1="0" x2="0" y2="512" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#6fd97a" stop-opacity="0.7"/>
-      <stop offset="0.5" stop-color="#0c2a12" stop-opacity="0"/>
-      <stop offset="1" stop-color="#000000" stop-opacity="0.6"/>
-    </linearGradient>
-    <filter id="glow" x="-25%" y="-25%" width="150%" height="150%">
-      <feGaussianBlur stdDeviation="6" result="b"/>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3.2" result="b"/>
       <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
-    <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="14"/>
+    <filter id="amb" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="22"/>
     </filter>
   </defs>
 
   <!-- App-icon body -->
-  <rect x="20" y="20" width="472" height="472" rx="116" fill="url(#bg)"/>
-  <rect x="20" y="20" width="472" height="472" rx="116" fill="url(#edge)"/>
-  <rect x="22.5" y="22.5" width="467" height="467" rx="113" fill="none" stroke="#7CFF8A" stroke-opacity="0.25" stroke-width="2"/>
-  <rect x="20" y="20" width="472" height="472" rx="116" fill="none" stroke="#020a05" stroke-width="3"/>
+  <rect x="16" y="16" width="480" height="480" rx="120" fill="url(#body)"/>
+  <rect x="16" y="16" width="480" height="480" rx="120" fill="url(#gloss)"/>
+  <rect x="18.5" y="18.5" width="475" height="475" rx="117.5" fill="none" stroke="#86ff90" stroke-opacity="0.22" stroke-width="2"/>
+  <rect x="16" y="16" width="480" height="480" rx="120" fill="none" stroke="#010804" stroke-width="3"/>
 
-  <!-- ambient glow behind emblem -->
-  <circle cx="256" cy="276" r="150" fill="#1fe04a" opacity="0.18" filter="url(#softGlow)"/>
+  <!-- ambient emblem glow -->
+  <circle cx="256" cy="292" r="126" fill="#1fe04a" opacity="0.16" filter="url(#amb)"/>
 
-  <!-- secondary lower ring -->
-  <path d="M86 213 A178 178 0 0 1 426 213" stroke="url(#ring)" stroke-width="14"
-        stroke-linecap="round" fill="none" opacity="0.55" filter="url(#glow)"/>
+  <!-- faint lower companion ring -->
+  <path d="M150 360 A150 150 0 0 1 362 360" stroke="url(#metal)" stroke-width="12"
+        stroke-linecap="round" fill="none" opacity="0.4"/>
 
   <!-- main power ring (gap at top) -->
   <g filter="url(#glow)">
-    <path d="M185.6 143.6 A150 150 0 1 1 326.4 143.6" stroke="url(#ring)" stroke-width="34"
-          stroke-linecap="round" fill="none"/>
-    <path d="M185.6 143.6 A150 150 0 1 1 326.4 143.6" stroke="url(#ringHi)" stroke-width="12"
-          stroke-linecap="round" fill="none" opacity="0.9" transform="translate(-3 -4)"/>
+    <!-- dark base for depth -->
+    <path d="M209.2 176.1 A125 125 0 1 0 302.8 176.1" stroke="#03200d" stroke-width="34" stroke-linecap="round" fill="none"/>
+    <!-- metal body -->
+    <path d="M209.2 176.1 A125 125 0 1 0 302.8 176.1" stroke="url(#metal)" stroke-width="26" stroke-linecap="round" fill="none"/>
+    <!-- top highlight -->
+    <path d="M209.2 176.1 A125 125 0 1 0 302.8 176.1" stroke="#eaffd6" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.75" transform="translate(0 -5)"/>
   </g>
 
   <!-- power stem -->
-  <rect x="237" y="104" width="38" height="118" rx="19" fill="url(#ring)" filter="url(#glow)"/>
-  <rect x="246" y="110" width="11" height="96" rx="5.5" fill="#eaffd9" opacity="0.85"/>
+  <g filter="url(#glow)">
+    <rect x="239" y="150" width="34" height="92" rx="17" fill="#03200d"/>
+    <rect x="241" y="152" width="30" height="88" rx="15" fill="url(#metal)"/>
+    <rect x="249" y="158" width="9" height="68" rx="4.5" fill="#eaffd6" opacity="0.85"/>
+  </g>
 
   <!-- AI wordmark with bevel -->
-  <text x="258" y="338" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
-        font-weight="800" font-size="150" letter-spacing="2" fill="#021406" opacity="0.55">AI</text>
-  <text x="256" y="334" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
-        font-weight="800" font-size="150" letter-spacing="2"
-        fill="url(#letters)" stroke="#eaffd9" stroke-width="2.5" stroke-opacity="0.9"
-        filter="url(#glow)">AI</text>
+  <g filter="url(#glow)">
+    <text x="259" y="345" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+          font-weight="800" font-size="132" letter-spacing="1" fill="#021406" opacity="0.6">AI</text>
+    <text x="256" y="341" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+          font-weight="800" font-size="132" letter-spacing="1"
+          fill="url(#letters)" stroke="#f0ffe0" stroke-width="2" stroke-opacity="0.9">AI</text>
+  </g>
 </svg>
