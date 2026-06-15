@@ -1,6 +1,7 @@
 import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { IndustryPicker } from "@/components/IndustryPicker";
+import { Logo } from "@/components/Logo";
 
 export default function IndustrySelectorPage() {
   return (
@@ -11,14 +12,7 @@ export default function IndustrySelectorPage() {
       <div className="container relative z-10 flex min-h-dvh flex-col py-10">
         {/* Brand */}
         <div className="flex items-center justify-center gap-2.5 text-base font-semibold">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo.svg"
-            alt="Genzic.AI"
-            width={40}
-            height={40}
-            className="h-10 w-10 rounded-[10px] shadow-lg shadow-primary/20"
-          />
+          <Logo size={40} className="h-10 w-10 drop-shadow-lg" />
           <span className="text-muted-foreground">Genzic.AI</span>
         </div>
 

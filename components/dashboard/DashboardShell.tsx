@@ -19,6 +19,7 @@ import {
 import type { Lead } from "@/lib/niches/types";
 import { getNiche } from "@/lib/niches";
 import { useProfile } from "@/lib/profile";
+import { Logo } from "@/components/Logo";
 import type { FiltersState } from "./types";
 import { StatCard } from "./StatCard";
 import { LeadCard } from "./LeadCard";
@@ -234,11 +235,13 @@ export function DashboardShell({ nicheId }: DashboardShellProps) {
                 <ChevronLeft className="h-5 w-5" />
               </Link>
             </Button>
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-niche/15 text-niche">
-              <NicheIcon className="h-5 w-5" />
-            </span>
+            {/* Genzic.AI brand mark */}
+            <Logo size={36} className="h-9 w-9" />
             <div className="min-w-0">
-              <h1 className="truncate text-base font-semibold leading-tight">{niche.label}</h1>
+              <h1 className="flex items-center gap-1.5 truncate text-base font-semibold leading-tight">
+                <NicheIcon className="h-3.5 w-3.5 shrink-0 text-niche" />
+                {niche.label}
+              </h1>
               <p className="truncate text-xs text-muted-foreground">
                 {profile.businessName.trim() || "NicheLead AI"}
               </p>

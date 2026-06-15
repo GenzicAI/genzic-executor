@@ -55,6 +55,18 @@
   }
 }
 
+/* Hide the Vercel preview/developer toolbar so it is never shown to end users.
+   The toolbar mounts as these custom elements / containers on preview deploys. */
+vercel-live-feedback,
+[data-vercel-toolbar],
+#vercel-toolbar,
+#vercel-live-feedback,
+.vercel-toolbar {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;

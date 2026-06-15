@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { TawkTo } from "@/components/integrations/TawkTo";
 import { ProfileProvider } from "@/lib/profile";
+import { ChatSettingsProvider } from "@/lib/chat-settings";
 
 export const metadata: Metadata = {
   title: "NicheLead AI — by Genzic.AI",
@@ -26,8 +27,10 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className="antialiased">
         <ProfileProvider>
-          {children}
-          <TawkTo />
+          <ChatSettingsProvider>
+            {children}
+            <TawkTo />
+          </ChatSettingsProvider>
         </ProfileProvider>
       </body>
     </html>
