@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 4%;
+    --foreground: 0 0% 96%;
+
+    --card: 240 10% 7%;
+    --card-foreground: 0 0% 96%;
+
+    --popover: 240 10% 7%;
+    --popover-foreground: 0 0% 96%;
+
+    --primary: 152 100% 39%;
+    --primary-foreground: 240 10% 4%;
+
+    --secondary: 240 6% 14%;
+    --secondary-foreground: 0 0% 96%;
+
+    --muted: 240 6% 14%;
+    --muted-foreground: 240 5% 60%;
+
+    --accent: 240 6% 16%;
+    --accent-foreground: 0 0% 96%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 6% 16%;
+    --input: 240 6% 16%;
+    --ring: 152 100% 39%;
+
+    --radius: 0.75rem;
+
+    /* Niche accent — overridden per niche on the dashboard root */
+    --niche: 152 100% 39%;
+    --niche-foreground: 240 10% 4%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* Respect iOS safe areas for the mobile bottom nav */
+  .pb-safe {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 0.5rem);
+  }
+}
+
+/* Hide the Vercel preview/developer toolbar so it is never shown to end users.
+   The toolbar mounts as these custom elements / containers on preview deploys. */
+vercel-live-feedback,
+[data-vercel-toolbar],
+#vercel-toolbar,
+#vercel-live-feedback,
+.vercel-toolbar {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .niche-gradient {
+    background-image: radial-gradient(
+      120% 120% at 50% 0%,
+      hsl(var(--niche) / 0.18) 0%,
+      transparent 55%
+    );
+  }
+}
