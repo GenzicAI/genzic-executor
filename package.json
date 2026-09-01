@@ -1,0 +1,9 @@
+{
+  "name": "genzic-executor",
+  "private": true,
+  "description": "Static Genzic Executor dashboard (index.html) plus its MCP door — /api/mcp exposes draft_email and send_email to the Genzic Command Center. No build step: index.html deploys as a static file exactly as before, /api is a zero-framework Vercel Node Function.",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^3.25.76"
+  }
+}
