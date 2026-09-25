@@ -42,6 +42,8 @@ const AGENT_KEYS = {
   victoria: process.env.EXECUTOR_MCP_KEY_VICTORIA || "",
   brittany: process.env.EXECUTOR_MCP_KEY_BRITTANY || "",
   brigitte: process.env.EXECUTOR_MCP_KEY_BRIGITTE || "",
+  // TIFFANY (Perplexity) - added 2026-09-25 so she has her own revocable Executor door like the other four.
+  tiffany: process.env.EXECUTOR_MCP_KEY_TIFFANY || "",
 };
 
 // This route is genuinely cross-origin from the Command Center (genzic.ai
