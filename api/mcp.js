@@ -182,7 +182,21 @@ function buildServer(agent) {
       }
       const safeReason = (reason && reason.trim()) || "Autonomous C-Suite Dispatch — " + from;
       logCall(agent, "send_email", { to, subject });
-      const data = await callAppsScript({ to, subject, body, from, reason: safeReason });
+      let data;
+      try {
+        data = await callAppsScript({ to, subject, body, from, reason: safeReason });
+      } catch (err) {
+        logCall(agent, "send_email_failed", { to, error: String((err && err.message) || err) });
+        return { isError: true, content: [{ type: "text", text: "Email not sent: could not reach the email engine." }] };
+      }
+      // The engine answers HTTP 200 with { status: "error", message } when it refuses (e.g. "Exception: Invalid
+      // email: Rob" for a bare name). This used to be reported as dispatched:true, so callers said "Sent" for mail
+      // that never left. A refusal is now a real tool error and nothing claims it went out.
+      if (data && data.status === "error") {
+        const reason = String(data.message || data.raw || "the email engine refused it.").replace(/^Exception:\s*/, "");
+        logCall(agent, "send_email_refused", { to, reason });
+        return { isError: true, content: [{ type: "text", text: "Email not sent: " + reason }] };
+      }
       return { content: [{ type: "text", text: JSON.stringify({ dispatched: true, to, subject, engineResponse: data }, null, 2) }] };
     }
   );
