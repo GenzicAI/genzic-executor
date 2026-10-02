@@ -186,15 +186,20 @@ function buildServer(agent) {
       description:
         'Send a previously drafted email through the Execution Engine. Requires confirmed=true — only set this when the user\'s own words explicitly confirmed the send in this turn ("send it", "send that", "yes send"). Never call this speculatively.',
       inputSchema: {
-        to: z.string(),
+        to: z.string().describe("One address, or up to six separated by commas"),
         subject: z.string(),
         body: z.string(),
         from: z.string(),
         reason: z.string().optional(),
+        attachment_ids: z
+          .array(z.string())
+          .max(10)
+          .optional()
+          .describe("Google Drive file ids uploaded through genzic.ai/api/attachments, attached to the email"),
         confirmed: z.boolean().describe("Must be true. Set only when the user's own words explicitly confirmed the send in this turn."),
       },
     },
-    async ({ to, subject, body, from, reason, confirmed }) => {
+    async ({ to, subject, body, from, reason, attachment_ids, confirmed }) => {
       if (!confirmed) {
         // Server-side gate, not just client-side — a client bug must not be
         // able to turn into a silent send. No Apps Script call happens below
@@ -202,10 +207,20 @@ function buildServer(agent) {
         return { isError: true, content: [{ type: "text", text: "Refused: send_email called without confirmed=true. No email was sent." }] };
       }
       const safeReason = (reason && reason.trim()) || "Autonomous C-Suite Dispatch — " + from;
-      logCall(agent, "send_email", { to, subject });
+      // Several recipients: comma-separated, at most six, each a real address (the engine would refuse a name).
+      const recipients = String(to).split(",").map((s) => s.trim()).filter(Boolean);
+      const bad = recipients.filter((r) => !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(r));
+      if (!recipients.length || recipients.length > 6 || bad.length) {
+        return {
+          isError: true,
+          content: [{ type: "text", text: "Email not sent: " + (bad.length ? "not an email address: " + bad.join(", ") : "use one to six addresses") + "." }],
+        };
+      }
+      const ids = (attachment_ids || []).filter((id) => /^[\w-]{10,}$/.test(id));
+      logCall(agent, "send_email", { to: recipients.join(", "), subject, attachments: ids.length });
       let data;
       try {
-        data = await callAppsScript({ to, subject, body, from, reason: safeReason });
+        data = await callAppsScript({ to: recipients.join(","), subject, body, from, reason: safeReason, attachmentIds: ids.join(",") });
       } catch (err) {
         logCall(agent, "send_email_failed", { to, error: String((err && err.message) || err) });
         return { isError: true, content: [{ type: "text", text: "Email not sent: could not reach the email engine." }] };
