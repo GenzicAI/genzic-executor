@@ -77,25 +77,45 @@ function logCall(agent, tool, extra) {
   console.log(JSON.stringify({ ts: new Date().toISOString(), agent, tool, ...extra }));
 }
 
-async function callAppsScript(formFields) {
+// opts.retry: try once more when the engine's reply never arrives as JSON (a Google error page or a dropped
+// connection). Only for draft_email - a draft sends nothing, so a second try is harmless. send_email is never
+// retried: a retry after a send that did go out would email the person twice.
+async function callAppsScript(formFields, opts = {}) {
   const body = Object.entries(formFields)
     .map(([k, v]) => encodeURIComponent(k) + "=" + encodeURIComponent(v ?? ""))
     .join("&");
-  const res = await fetch(APPS_SCRIPT_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body,
-  });
-  const text = await res.text();
-  try {
-    return JSON.parse(text);
-  } catch {
-    // The dashboard's own "fire" call never reads a response at all (posted
-    // with mode:'no-cors' from the browser) — this endpoint was never
-    // contracted to return JSON on every path. A non-JSON 200 here is
-    // treated as success rather than an error on a format it doesn't owe us.
-    return { status: res.ok ? "ok" : "error", raw: text };
+  const attempts = opts.retry ? 2 : 1;
+  let last;
+  for (let i = 0; i < attempts; i++) {
+    let res;
+    let text;
+    try {
+      res = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body,
+      });
+      text = await res.text();
+    } catch (err) {
+      last = { status: "error", message: "Can't reach the Execution Engine (" + ((err && err.message) || err) + ")." };
+      continue;
+    }
+    try {
+      return JSON.parse(text);
+    } catch {
+      // The dashboard's own "fire" call never reads a response at all (posted
+      // with mode:'no-cors' from the browser) — this endpoint was never
+      // contracted to return JSON on every path. A non-JSON 200 here is
+      // treated as success rather than an error on a format it doesn't owe us.
+      if (res.ok) return { status: "ok", raw: text };
+      // Not JSON and not OK: Google's own error page, not the engine. Say what it was (status + the page's
+      // text) instead of a bare "Execution Engine error", and log it for Vercel.
+      const page = String(text || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 200);
+      last = { status: "error", message: "the Execution Engine answered HTTP " + res.status + (page ? " - " + page : "") };
+      console.log(JSON.stringify({ ts: new Date().toISOString(), engineError: last.message, attempt: i + 1 }));
+    }
   }
+  return last;
 }
 
 function notImplemented(name) {
@@ -147,8 +167,9 @@ function buildServer(agent) {
         agentName: agent_name,
         agentEmail: agent_email,
         agentRole: agent_role || "Executive",
-      });
+      }, { retry: true });
       if (data.status === "error") {
+        console.log(JSON.stringify({ ts: new Date().toISOString(), agent, tool: "draft_email", failed: data.message || "no reason given" }));
         return { isError: true, content: [{ type: "text", text: "Draft failed: " + (data.message || "Execution Engine error") }] };
       }
       if (data.status !== "generated") {
